@@ -5,9 +5,9 @@ interface PasswordEntry{
     id: number,
     service_name: string,
     service_username : string,
-    password : string,
-    notes: string,
-    site_url: string
+    password? : string,
+    notes?: string,
+    site_url?: string
 }
 
 
@@ -30,10 +30,8 @@ export default function PasswordList({ passwords, onDelete}: PasswordListProps){
       {passwords.map(p => (
         <div key={p.id}>
           <h3>{p.service_name}</h3>
-          <p>Username: {p.service_username}</p>
-          <p>Password: {p.password}</p>
-          <p>Notes: {p.notes}</p>
           <p>URL: {p.site_url}</p>
+          <button onClick={() => navigate(`/details/${p.id}`)}>Details</button>
           <button onClick={() => navigate(`/edit/${p.id}`)}>Edit</button>
           <button onClick={() => handleDelete(p.id)}>Delete</button>
         </div>
