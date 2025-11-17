@@ -32,7 +32,6 @@ export default function PasswordList({ passwords, onDelete}: PasswordListProps){
           <h3>{p.service_name}</h3>
           <p>URL: {p.site_url}</p>
           <button onClick={() => navigate(`/details/${p.id}`)}>Details</button>
-          <button onClick={() => navigate(`/edit/${p.id}`)}>Edit</button>
           <button onClick={() => handleDelete(p.id)}>Delete</button>
         </div>
       ))}

@@ -1,7 +1,7 @@
 import { getPassword } from "../api/password";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 interface PasswordEntry{
     id: number,
@@ -19,6 +19,8 @@ interface PasswordListProps{
 
 
 export default function EntryDetails( {passwords} : PasswordListProps){
+    const navigate = useNavigate()
+
     const [entry, setEntry] = useState<PasswordEntry|null>(null)
     const {id} = useParams<{id : string}>()
 
@@ -58,6 +60,7 @@ export default function EntryDetails( {passwords} : PasswordListProps){
                     <p>Password: {entry.password}</p>
                     <p>Notes: {entry.notes}</p>
                     <p>Site URL: {entry.site_url}</p>
+                    <button onClick={() => navigate(`/edit/${p.id}`)}>Edit</button>
                 </div>
             ) : (
                 <p>Entry Details Not Found</p>
