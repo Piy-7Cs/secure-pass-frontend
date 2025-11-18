@@ -1,10 +1,11 @@
 import axios from "axios";
-import { BASE_URL } from "./auth";
-import { useNavigate } from "react-router-dom";
 
+
+const BASE_URL = "http://localhost:8000"
 
 const api = axios.create({
-    baseURL: BASE_URL
+    baseURL: BASE_URL,
+    withCredentials: true
 })
 
 
@@ -24,12 +25,25 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   response => response,
-  error => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      
-      
+  async (error) => {
+    const originalRequest = error.config;
 
+    if (error.response?.status === 401 && !originalRequest._retry) {
+
+      originalRequest._retry = true
+
+       try{
+
+          const res = await axios.post(`${BASE_URL}/auth/refresh`, {}, {withCredentials: true})
+          const newAccessToken = res.data.access_token;
+
+          localStorage.setItem("token", newAccessToken);
+
+       }catch(err){
+          localStorage.removeItem("token");
+          console.error("Token refresh failed:", err);
+          
+       }
 
     }
     return Promise.reject(error);

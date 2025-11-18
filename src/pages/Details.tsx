@@ -36,7 +36,8 @@ export default function EntryDetails( {passwords} : PasswordListProps){
 
                 if (FoundEntry){
                     try{
-                    const decPassword = await getPassword(entryId)
+                    const res = await getPassword(entryId)
+                    const decPassword = res.password
                     setEntry({...FoundEntry, password: decPassword})
 
                     }
@@ -50,6 +51,13 @@ export default function EntryDetails( {passwords} : PasswordListProps){
     }, [id, passwords]);
 
 
+    const [showPassword, setShowPassword] = useState(false)
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(prevState => !prevState)
+    };
+
+
     return (
 
         <div>
@@ -57,10 +65,13 @@ export default function EntryDetails( {passwords} : PasswordListProps){
                 <div>
                     <h1>Details for {entry.service_name}</h1>
                     <p>Username: {entry.service_username}</p>
-                    <p>Password: {entry.password}</p>
+                    <p>Password: {showPassword ? entry.password : "*******"}
+                        <button onClick={togglePasswordVisibility }> {showPassword? "Hide" : "Show"} Password 
+                        </button>
+                    </p>
                     <p>Notes: {entry.notes}</p>
                     <p>Site URL: {entry.site_url}</p>
-                    <button onClick={() => navigate(`/edit/${p.id}`)}>Edit</button>
+                    <button onClick={() => navigate(`/edit/${id}`)}>Edit</button>
                 </div>
             ) : (
                 <p>Entry Details Not Found</p>
@@ -69,9 +80,6 @@ export default function EntryDetails( {passwords} : PasswordListProps){
         </div>
 
     )
-
-
-
 }
 
 

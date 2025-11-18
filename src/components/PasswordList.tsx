@@ -13,15 +13,17 @@ interface PasswordEntry{
 
 interface PasswordListProps{
     passwords : PasswordEntry[];
-    onDelete : () => void
+    onDelete : () => void;
+    refreshEntries : () => Promise<void>;
 }
 
 
-export default function PasswordList({ passwords, onDelete}: PasswordListProps){
+export default function PasswordList({ passwords, onDelete, refreshEntries}: PasswordListProps){
     const navigate = useNavigate()
 
     const handleDelete = async (id: number) => {
         await deletePassword(id);
+        await refreshEntries();
         onDelete();
     };
 
