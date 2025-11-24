@@ -17,7 +17,7 @@ export default function Login(){
         e.preventDefault();
         try {
             const data = await login(username, password);
-            loginUser(data.access_token);
+            loginUser(data.data("access_token"));
             navigate("/dashboard");
         }
         catch(err){
