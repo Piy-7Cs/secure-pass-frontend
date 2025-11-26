@@ -39,6 +39,8 @@ api.interceptors.response.use(
 
           localStorage.setItem("token", newAccessToken);
 
+          return api(originalRequest)
+
        }catch(err){
           localStorage.removeItem("token");
           console.error("Token refresh failed:", err);

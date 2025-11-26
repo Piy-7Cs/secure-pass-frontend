@@ -1,5 +1,7 @@
 import {  useState, type FormEvent } from "react";
 import { createEntry, updateEntry } from "../api/password";
+import { useNavigate } from "react-router-dom";
+
 
 interface PasswordFormProps {
     entryId? : number,
@@ -14,7 +16,7 @@ interface PasswordFormProps {
 }
 
 export default function PasswordForm( {entryId, initialData, onSuccess} : PasswordFormProps){
-
+    const navigate = useNavigate()
     const [serviceName, setServiceName ] = useState(initialData?.service_name || "");
     const [serviceUsername, setServiceUsername] = useState(initialData?.service_username || "");
     const [password, setPassword] = useState(initialData?.password || "");
@@ -32,6 +34,7 @@ export default function PasswordForm( {entryId, initialData, onSuccess} : Passwo
             }
             onSuccess();
             setServiceName(""); setServiceUsername(""); setPassword(""); setNotes(""), setSiteUrl("");
+            navigate("/")
 
         } catch(err){
             console.error(err);

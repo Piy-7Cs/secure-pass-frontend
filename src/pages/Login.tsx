@@ -17,7 +17,13 @@ export default function Login(){
         e.preventDefault();
         try {
             const data = await login(username, password);
-            loginUser(data.data("access_token"));
+
+            if (!data.success) {
+                setError(data.error || "Invalid credentials");
+                return;
+            }
+
+            loginUser(data.data.access_token);
             navigate("/dashboard");
         }
         catch(err){
@@ -30,9 +36,11 @@ export default function Login(){
 
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
-      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+      <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} /> <br />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} /> <br /> <br />
       <button type="submit">Login</button>
+      <p onClick={() => navigate("/register")}>Register Instead</p>
+      <p onClick={() => navigate("/forgot-password")}>Forgot Password?</p>  
       {error && <p>{error}</p>}
     </form>
 

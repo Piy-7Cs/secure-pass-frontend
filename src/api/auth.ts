@@ -31,7 +31,7 @@ export async function register(username: string, password: string, email: string
 
 export async function forgotPassword(email: string): Promise<ApiResult<any>> {
   try {
-    const res = await api.post(`/auth/forgot-password`, { email });
+    const res = await api.post(`/auth/forgot-password`, { email }, { headers: { "Content-Type": "application/json" }});
     return { success: true, data: res.data };
   } catch (err: any) {
     return { success: false, error: err.response?.data?.detail || err.message };

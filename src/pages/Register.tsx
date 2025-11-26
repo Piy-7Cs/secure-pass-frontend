@@ -16,10 +16,16 @@ export default function Register(){
         e.preventDefault()
 
         try {
-            await register(username, password, email);
-            navigate("/login");
+            const data = await register(username, password, email);
+            if (data.success){
+              navigate("/login")
+            }
+            else[
+              setError("Registration Failed, Maybe try a Different username")
+            ]
+            
         }catch(err){
-            setError("Registration failed")
+            setError("Registration failed, Maybe try a Different username")
         }
     };
 
@@ -28,10 +34,11 @@ export default function Register(){
     return (
       <form onSubmit={handleSubmit}>
         <h2>Sign Up</h2>
-        <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
+        <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} />  <br />
+        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} /> <br />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} /> <br /> <br />
         <button type="submit">Register</button>
+        <p onClick={() => navigate("/login")}>Already signed in? Login</p>
         {error && <p>{error}</p>}
       </form>
     );

@@ -1,7 +1,7 @@
 import { deletePassword } from "../api/password";
 import { useNavigate } from "react-router-dom";
 
-interface PasswordEntry{
+export interface PasswordEntry{
     id: number,
     service_name: string,
     service_username : string,
@@ -22,9 +22,14 @@ export default function PasswordList({ passwords, onDelete, refreshEntries}: Pas
     const navigate = useNavigate()
 
     const handleDelete = async (id: number) => {
+       try{ 
         await deletePassword(id);
         await refreshEntries();
         onDelete();
+      }
+        catch(err){
+          console.error(err)
+        }
     };
 
     return (

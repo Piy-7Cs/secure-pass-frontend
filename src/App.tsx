@@ -4,9 +4,11 @@ import Register from "./pages/Register";
 import EntryDetails from "./pages/Details";
 import { getEntries } from "./api/password";
 import { useEffect, useState } from "react";
-import PasswordList from "./components/PasswordList";
-import PasswordForm from "./components/PasswordForm";
+
+
 import EditPassword from "./pages/EditPassword";
+import ForgotPassword from "./pages/ForgotPassword";
+import Dashboard from "./pages/Dashboard";
 
 function App(){
   const [entries, setEntries] = useState([])
@@ -23,7 +25,9 @@ function App(){
   }
 
   useEffect( ()=> {
+    if (!localStorage.getItem("token")) return;
     fetchEntries()
+    console.log(entries)
   }, [])
 
   
@@ -34,12 +38,16 @@ function App(){
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/dashboard" element={<Dashboard entries={entries} refresh={fetchEntries}/>}/>
+        <Route path="/" element={<Dashboard entries={entries} refresh={fetchEntries}/>}/>
+
         <Route path="/login" element ={<Login />} /> 
         <Route path="/register" element={<Register />} /> 
-        <Route path="/" element={<PasswordList passwords={entries} onDelete={() => {console.log("Successfully deleted Password")}} refreshEntries={fetchEntries} />} />
+        
         <Route path="/details/:id" element={<EntryDetails passwords={entries}/>} />
-        <Route path="/entry" element={<PasswordForm onSuccess={() => console.log("Password Entry created successfully")} />}/>
+        
         <Route path="/edit/:id" element={<EditPassword />} />
+        <Route path="/forgot-password" element= {<ForgotPassword />} />
       </Routes>
     </BrowserRouter>
   );
