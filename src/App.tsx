@@ -4,7 +4,7 @@ import Register from "./pages/Register";
 import EntryDetails from "./pages/Details";
 import { getEntries } from "./api/password";
 import { useEffect, useState } from "react";
-
+import ResetPassword from "./pages/ResetPassword";
 
 import EditPassword from "./pages/EditPassword";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -48,6 +48,7 @@ function App(){
         
         <Route path="/edit/:id" element={<EditPassword />} />
         <Route path="/forgot-password" element= {<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );

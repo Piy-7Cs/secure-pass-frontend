@@ -23,6 +23,7 @@ export default function EntryDetails( {passwords} : PasswordListProps){
 
     const [entry, setEntry] = useState<PasswordEntry|null>(null)
     const {id} = useParams<{id : string}>()
+    
 
     useEffect( ()=> {
 
