@@ -1,56 +1,48 @@
 import axios from "axios";
 
-
-const BASE_URL = "http://localhost:8000"
+const BASE_URL = "http://localhost:8000";
 
 const api = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: true
-})
-
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
 
 api.interceptors.request.use(
-    (config) => {
-        const token =  localStorage.getItem("token");
-        
-        if (token){
-                config.headers.Authorization = `Bearer ${token}`
-        };
-            
-        return config;      
-    },
-    (error) => {Promise.reject(error)}
-)
-
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 api.interceptors.response.use(
-  response => response,
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-      originalRequest._retry = true
+      try {
+        const res = await axios.post(
+          `${BASE_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        const newAccessToken = res.data.access_token;
 
-       try{
-
-          const res = await axios.post(`${BASE_URL}/auth/refresh`, {}, {withCredentials: true})
-          const newAccessToken = res.data.access_token;
-
-          localStorage.setItem("token", newAccessToken);
-
-          return api(originalRequest)
-
-       }catch(err){
-          localStorage.removeItem("token");
-          console.error("Token refresh failed:", err);
-          
-       }
-
+        localStorage.setItem("token", newAccessToken);
+        return api(originalRequest);
+      } catch (err) {
+        localStorage.removeItem("token");
+        console.error("Token refresh failed:", err);
+      }
     }
     return Promise.reject(error);
   }
 );
 
-
-export default api
+export default api;

@@ -1,60 +1,82 @@
-import {BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState, useCallback, type ReactNode } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import EntryDetails from "./pages/Details";
-import { getEntries } from "./api/password";
-import { useEffect, useState } from "react";
 import ResetPassword from "./pages/ResetPassword";
-
-import EditPassword from "./pages/EditPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
+import { getEntries } from "./api/password";
+import { useAuth } from "./context/AuthContext";
+import { type PasswordEntry } from "./components/PasswordList";
 
-function App(){
-  const [entries, setEntries] = useState([])
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return null;
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+}
 
- 
-  const fetchEntries = async () => {
+function PublicRoute({ children }: { children: ReactNode }) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) return null;
+  return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
+}
+
+function App() {
+  const [entries, setEntries] = useState<PasswordEntry[]>([]);
+  const [loadingEntries, setLoadingEntries] = useState(false);
+  const { user } = useAuth();
+
+  const fetchEntries = useCallback(async () => {
+    if (!localStorage.getItem("token")) {
+      setEntries([]);
+      return;
+    }
+    setLoadingEntries(true);
     try {
       const data = await getEntries();
-      console.log(data)
-      setEntries(data)
-     }catch(err){
-        console.error(err)
+      setEntries(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingEntries(false);
     }
-  }
+  }, []);
 
-  useEffect( ()=> {
-    if (!localStorage.getItem("token")) return;
-    fetchEntries()
-    console.log(entries)
-  }, [])
-
-  
-  
-
-
+  useEffect(() => {
+    if (user) {
+      fetchEntries();
+    } else {
+      setEntries([]);
+    }
+  }, [user, fetchEntries]);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard entries={entries} refresh={fetchEntries}/>}/>
-        <Route path="/" element={<Dashboard entries={entries} refresh={fetchEntries}/>}/>
-
-        <Route path="/login" element ={<Login />} /> 
-        <Route path="/register" element={<Register />} /> 
-        
-        <Route path="/details/:id" element={<EntryDetails passwords={entries}/>} />
-        
-        <Route path="/edit/:id" element={<EditPassword />} />
-        <Route path="/forgot-password" element= {<ForgotPassword />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard entries={entries} loading={loadingEntries} refresh={fetchEntries} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard entries={entries} loading={loadingEntries} refresh={fetchEntries} />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+        <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
-
-
-
 }
 
-export default App
+export default App;
